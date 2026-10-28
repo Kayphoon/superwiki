@@ -1,0 +1,18 @@
+# CodeGraph index (symlink to omo-managed cache)
+.codegraph
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Node package tooling
+node_modules/

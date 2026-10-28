@@ -1,0 +1,43 @@
+{
+  "name": "@kayphoon/superwiki-skill",
+  "version": "1.0.0",
+  "description": "SuperWiki skill: keep a project wiki under .wiki/skills in sync with the code.",
+  "type": "module",
+  "bin": {
+    "superwiki": "bin/skill.mjs"
+  },
+  "files": [
+    "bin",
+    "SKILL.md",
+    "references",
+    "tests",
+    "skills.sh",
+    "superwiki-init",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "info": "node bin/skill.mjs info"
+  },
+  "keywords": [
+    "agent-skills",
+    "skills",
+    "codex",
+    "claude-code",
+    "superwiki",
+    "knowledge-base",
+    "npx"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kayphoon/superwiki.git"
+  },
+  "homepage": "https://github.com/Kayphoon/superwiki#readme",
+  "bugs": {
+    "url": "https://github.com/Kayphoon/superwiki/issues"
+  }
+}

@@ -1,0 +1,137 @@
+#!/bin/bash
+# 初始化项目的 superwiki 知识库
+# 用法: superwiki-init [--all|--codex|--opencode|--claude|--cursor] [项目路径]
+
+set -e
+
+usage() {
+    echo "用法: superwiki-init [--all|--codex|--opencode|--claude|--cursor] [项目路径]"
+    echo ""
+    echo "默认初始化全部支持的项目级 skill 入口:"
+    echo "  .agents/skills   -> ../.wiki/skills  (Codex / agent-compatible)"
+    echo "  .opencode/skills -> ../.wiki/skills  (OpenCode)"
+    echo "  .claude/skills   -> ../.wiki/skills  (Claude Code)"
+    echo "  .cursor/skills   -> ../.wiki/skills  (Cursor)"
+    echo ""
+    echo "所有入口都指向同一个知识库 .wiki/skills，SKILL.md 通过 name/description 被发现。"
+}
+
+PROJECT_DIR=""
+INIT_CODEX=0
+INIT_OPENCODE=0
+INIT_CLAUDE=0
+INIT_CURSOR=0
+INIT_ALL=0
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --all)
+            INIT_ALL=1
+            ;;
+        --codex|--agents)
+            INIT_CODEX=1
+            ;;
+        --opencode)
+            INIT_OPENCODE=1
+            ;;
+        --claude|--claude-code)
+            INIT_CLAUDE=1
+            ;;
+        --cursor)
+            INIT_CURSOR=1
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        -*)
+            echo "未知选项: $1" >&2
+            usage >&2
+            exit 2
+            ;;
+        *)
+            if [ -n "$PROJECT_DIR" ]; then
+                echo "只能指定一个项目路径" >&2
+                usage >&2
+                exit 2
+            fi
+            PROJECT_DIR="$1"
+            ;;
+    esac
+    shift
+done
+
+PROJECT_DIR="${PROJECT_DIR:-.}"
+
+if [ "$INIT_ALL" -eq 1 ] || { [ "$INIT_CODEX" -eq 0 ] && [ "$INIT_OPENCODE" -eq 0 ] && [ "$INIT_CLAUDE" -eq 0 ] && [ "$INIT_CURSOR" -eq 0 ]; }; then
+    INIT_CODEX=1
+    INIT_OPENCODE=1
+    INIT_CLAUDE=1
+    INIT_CURSOR=1
+fi
+
+cd "$PROJECT_DIR"
+
+echo "初始化 superwiki 知识库..."
+echo "项目路径: $(pwd)"
+
+# 1. 创建知识库目录
+mkdir -p .wiki/skills
+echo "✅ 创建 .wiki/skills/"
+
+resolve_link_dir() {
+    LINK_PATH="$1"
+    LINK_DIR="$(dirname "$LINK_PATH")"
+    LINK_TARGET="$(readlink "$LINK_PATH")"
+    case "$LINK_TARGET" in
+        /*) TARGET_PATH="$LINK_TARGET" ;;
+        *) TARGET_PATH="$LINK_DIR/$LINK_TARGET" ;;
+    esac
+    cd "$TARGET_PATH" 2>/dev/null && pwd -P
+}
+
+create_skill_link() {
+    LABEL="$1"
+    LINK_PATH="$2"
+    TARGET="../.wiki/skills"
+    WIKI_REALPATH="$(cd .wiki/skills && pwd -P)"
+
+    mkdir -p "$(dirname "$LINK_PATH")"
+
+    if [ -L "$LINK_PATH" ]; then
+        LINK_TARGET="$(readlink "$LINK_PATH")"
+        LINK_REALPATH="$(resolve_link_dir "$LINK_PATH" || true)"
+        if [ "$LINK_REALPATH" = "$WIKI_REALPATH" ]; then
+            echo "⏭️  $LINK_PATH 已正确指向 .wiki/skills，跳过 ($LABEL)"
+        else
+            echo "⚠️  $LINK_PATH 已存在但指向 $LINK_TARGET ($LABEL)"
+            echo "    请手动确认后再调整为: $LINK_PATH → $TARGET"
+        fi
+    elif [ -e "$LINK_PATH" ]; then
+        echo "⚠️  $LINK_PATH 已存在且不是符号链接，跳过 ($LABEL)"
+        echo "    请手动确认后再调整为: $LINK_PATH → $TARGET"
+    else
+        ln -s "$TARGET" "$LINK_PATH"
+        echo "✅ 创建 $LINK_PATH → $TARGET ($LABEL)"
+    fi
+}
+
+# 2. 各 agent 的项目级 skill 入口
+if [ "$INIT_CODEX" -eq 1 ]; then
+    create_skill_link "Codex / agent-compatible" ".agents/skills"
+fi
+
+if [ "$INIT_OPENCODE" -eq 1 ]; then
+    create_skill_link "OpenCode" ".opencode/skills"
+fi
+
+if [ "$INIT_CLAUDE" -eq 1 ]; then
+    create_skill_link "Claude Code" ".claude/skills"
+fi
+
+if [ "$INIT_CURSOR" -eq 1 ]; then
+    create_skill_link "Cursor" ".cursor/skills"
+fi
+
+echo "完成！开始使用:"
+echo "  skill(name=\"superwiki\")"

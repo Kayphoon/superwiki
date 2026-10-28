@@ -9,10 +9,12 @@
 npx skills add Kayphoon/superwiki
 
 # 或走本仓库自带的安装器（零依赖，默认装到 ~/.agents/skills）
-npx github:Kayphoon/superwiki
-npx github:Kayphoon/superwiki --target codex
-npx github:Kayphoon/superwiki --project ./my-project
+npx github:Kayphoon/superwiki#v1.0.1
+npx github:Kayphoon/superwiki#v1.0.1 --target codex
+npx github:Kayphoon/superwiki#v1.0.1 --project ./my-project
 ```
+
+钉版本是默认写法：`#v1.0.1` 是 git ref，npm 会把仓库解析到对应 tag 或 commit，之后上游再改分支也不会影响你。想去掉 ref 追默认分支就写 `npx github:Kayphoon/superwiki`，升级时加 `--force` 覆盖已装副本。
 
 装好后新开一次会话让运行时重新发现 skill；项目侧的知识库入口用 `superwiki-init` 建立。
 

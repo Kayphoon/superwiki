@@ -1,6 +1,6 @@
 {
   "name": "@kayphoon/superwiki-skill",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "SuperWiki skill: keep a project wiki under .wiki/skills in sync with the code.",
   "type": "module",
   "bin": {

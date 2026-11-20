@@ -1,3 +1,5 @@
+> **已迁移**：本 skill 现在维护在 [Kayphoon/superkit](https://github.com/Kayphoon/superkit)，路径 `skills/superwiki/`。本仓库保留为只读归档，历史仍在。
+
 # SuperWiki
 
 ## 安装
